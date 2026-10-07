@@ -117,6 +117,7 @@
       font-weight: 800;
       letter-spacing: -1px;
       margin-bottom: 20px;
+      word-break: break-word;
     }
 
     .money-grid {
@@ -140,6 +141,7 @@
     .money-box-value {
       font-size: 17px;
       font-weight: 700;
+      word-break: break-word;
     }
 
     .income {
@@ -397,6 +399,7 @@
     .stat-value {
       font-size: 18px;
       font-weight: 800;
+      word-break: break-word;
     }
 
     /* FOOTER */
@@ -415,6 +418,14 @@
 
       .balance {
         font-size: 30px;
+      }
+
+      .transaction {
+        align-items: flex-start;
+      }
+
+      .transaction-amount {
+        font-size: 13px;
       }
     }
   </style>
@@ -909,22 +920,112 @@
       <h2>⚙️ Settings</h2>
 
       <div class="card-subtitle">
-        Manage your Money Brain data
+        Manage your Money Brain preferences and data
       </div>
 
       <div class="form-group">
 
-        <label>Currency Symbol</label>
+        <label>🌍 Currency</label>
 
-        <select id="currencySelect" onchange="changeCurrency()">
+        <select
+          id="currencySelect"
+          onchange="changeCurrency()">
 
-          <option value="$">$ — US Dollar</option>
-          <option value="₦">₦ — Nigerian Naira</option>
-          <option value="£">£ — British Pound</option>
-          <option value="€">€ — Euro</option>
-          <option value="R">R — South African Rand</option>
-          <option value="KSh">KSh — Kenyan Shilling</option>
-          <option value="GH₵">GH₵ — Ghanaian Cedi</option>
+          <option value="USD">
+            🇺🇸 USD — US Dollar ($)
+          </option>
+
+          <option value="NGN">
+            🇳🇬 NGN — Nigerian Naira (₦)
+          </option>
+
+          <option value="GBP">
+            🇬🇧 GBP — British Pound (£)
+          </option>
+
+          <option value="EUR">
+            🇪🇺 EUR — Euro (€)
+          </option>
+
+          <option value="CAD">
+            🇨🇦 CAD — Canadian Dollar (C$)
+          </option>
+
+          <option value="AUD">
+            🇦🇺 AUD — Australian Dollar (A$)
+          </option>
+
+          <option value="NZD">
+            🇳🇿 NZD — New Zealand Dollar (NZ$)
+          </option>
+
+          <option value="ZAR">
+            🇿🇦 ZAR — South African Rand (R)
+          </option>
+
+          <option value="KES">
+            🇰🇪 KES — Kenyan Shilling (KSh)
+          </option>
+
+          <option value="GHS">
+            🇬🇭 GHS — Ghanaian Cedi (GH₵)
+          </option>
+
+          <option value="AED">
+            🇦🇪 AED — UAE Dirham (د.إ)
+          </option>
+
+          <option value="INR">
+            🇮🇳 INR — Indian Rupee (₹)
+          </option>
+
+          <option value="JPY">
+            🇯🇵 JPY — Japanese Yen (¥)
+          </option>
+
+          <option value="CNY">
+            🇨🇳 CNY — Chinese Yuan (¥)
+          </option>
+
+          <option value="SGD">
+            🇸🇬 SGD — Singapore Dollar (S$)
+          </option>
+
+          <option value="CHF">
+            🇨🇭 CHF — Swiss Franc (CHF)
+          </option>
+
+          <option value="SEK">
+            🇸🇪 SEK — Swedish Krona (kr)
+          </option>
+
+          <option value="NOK">
+            🇳🇴 NOK — Norwegian Krone (kr)
+          </option>
+
+          <option value="DKK">
+            🇩🇰 DKK — Danish Krone (kr)
+          </option>
+
+          <option value="BRL">
+            🇧🇷 BRL — Brazilian Real (R$)
+          </option>
+
+          <option value="MXN">
+            🇲🇽 MXN — Mexican Peso ($)
+          </option>
+
+          <option value="PLN">
+            🇵🇱 PLN — Polish Złoty (zł)
+          </option>
+
+          <option value="TRY">
+            🇹🇷 TRY — Turkish Lira (₺)
+          </option>
+
+          <option value="SAR">
+            🇸🇦 SAR — Saudi Riyal (﷼)
+          </option>
 
         </select>
 
@@ -970,20 +1071,247 @@
 
 
   /* =========================================
+     CURRENCIES
+  ========================================= */
+
+  const CURRENCIES = {
+
+    USD: {
+      symbol: "$",
+      name: "US Dollar"
+    },
+
+    NGN: {
+      symbol: "₦",
+      name: "Nigerian Naira"
+    },
+
+    GBP: {
+      symbol: "£",
+      name: "British Pound"
+    },
+
+    EUR: {
+      symbol: "€",
+      name: "Euro"
+    },
+
+    CAD: {
+      symbol: "C$",
+      name: "Canadian Dollar"
+    },
+
+    AUD: {
+      symbol: "A$",
+      name: "Australian Dollar"
+    },
+
+    NZD: {
+      symbol: "NZ$",
+      name: "New Zealand Dollar"
+    },
+
+    ZAR: {
+      symbol: "R",
+      name: "South African Rand"
+    },
+
+    KES: {
+      symbol: "KSh",
+      name: "Kenyan Shilling"
+    },
+
+    GHS: {
+      symbol: "GH₵",
+      name: "Ghanaian Cedi"
+    },
+
+    AED: {
+      symbol: "د.إ",
+      name: "UAE Dirham"
+    },
+
+    INR: {
+      symbol: "₹",
+      name: "Indian Rupee"
+    },
+
+    JPY: {
+      symbol: "¥",
+      name: "Japanese Yen"
+    },
+
+    CNY: {
+      symbol: "¥",
+      name: "Chinese Yuan"
+    },
+
+    SGD: {
+      symbol: "S$",
+      name: "Singapore Dollar"
+    },
+
+    CHF: {
+      symbol: "CHF",
+      name: "Swiss Franc"
+    },
+
+    SEK: {
+      symbol: "kr",
+      name: "Swedish Krona"
+    },
+
+    NOK: {
+      symbol: "kr",
+      name: "Norwegian Krone"
+    },
+
+    DKK: {
+      symbol: "kr",
+      name: "Danish Krone"
+    },
+
+    BRL: {
+      symbol: "R$",
+      name: "Brazilian Real"
+    },
+
+    MXN: {
+      symbol: "$",
+      name: "Mexican Peso"
+    },
+
+    PLN: {
+      symbol: "zł",
+      name: "Polish Złoty"
+    },
+
+    TRY: {
+      symbol: "₺",
+      name: "Turkish Lira"
+    },
+
+    SAR: {
+      symbol: "﷼",
+      name: "Saudi Riyal"
+    }
+
+  };
+
+
+  /* =========================================
+     CURRENCY MIGRATION
+  ========================================= */
+
+  function normalizeCurrency(value) {
+
+    const legacyMap = {
+
+      "$": "USD",
+
+      "₦": "NGN",
+
+      "£": "GBP",
+
+      "€": "EUR",
+
+      "R": "ZAR",
+
+      "KSh": "KES",
+
+      "GH₵": "GHS"
+
+    };
+
+    if (CURRENCIES[value]) {
+      return value;
+    }
+
+    if (legacyMap[value]) {
+      return legacyMap[value];
+    }
+
+    return "USD";
+
+  }
+
+
+  /* =========================================
      DATA
   ========================================= */
 
+  let storedState = null;
+
+  try {
+
+    storedState =
+      JSON.parse(
+        localStorage.getItem(
+          "moneyBrainData"
+        )
+      );
+
+  } catch (error) {
+
+    storedState = null;
+
+  }
+
+
   let state =
-    JSON.parse(
-      localStorage.getItem("moneyBrainData")
-    ) || {
+    storedState || {
 
       transactions: [],
+
       budget: 0,
+
       goals: [],
-      currency: "$"
+
+      currency: "USD"
 
     };
+
+
+  /* =========================================
+     DATA SAFETY
+  ========================================= */
+
+  if (
+    !Array.isArray(
+      state.transactions
+    )
+  ) {
+
+    state.transactions = [];
+
+  }
+
+
+  if (
+    !Array.isArray(
+      state.goals
+    )
+  ) {
+
+    state.goals = [];
+
+  }
+
+
+  if (
+    typeof state.budget !== "number" ||
+    !isFinite(state.budget)
+  ) {
+
+    state.budget = 0;
+
+  }
+
+
+  state.currency =
+    normalizeCurrency(
+      state.currency
+    );
 
 
   /* =========================================
@@ -1008,9 +1336,33 @@
 
   function money(amount) {
 
+    const currency =
+      CURRENCIES[
+        normalizeCurrency(
+          state.currency
+        )
+      ] || CURRENCIES.USD;
+
+
+    const safeAmount =
+      Number(amount);
+
+
+    if (
+      !isFinite(safeAmount)
+    ) {
+
+      return (
+        currency.symbol +
+        "0.00"
+      );
+
+    }
+
+
     return (
-      state.currency +
-      Number(amount).toLocaleString(
+      currency.symbol +
+      safeAmount.toLocaleString(
         undefined,
         {
           minimumFractionDigits: 2,
@@ -1031,27 +1383,52 @@
     document
       .querySelectorAll(".section")
       .forEach(
-        el => el.classList.remove("active")
+        el =>
+          el.classList.remove(
+            "active"
+          )
       );
 
-    document
-      .getElementById("section-" + section)
-      .classList.add("active");
+
+    const target =
+      document.getElementById(
+        "section-" + section
+      );
+
+
+    if (target) {
+
+      target.classList.add(
+        "active"
+      );
+
+    }
+
 
     document
       .querySelectorAll(".nav button")
       .forEach(
-        btn => btn.classList.remove("active")
+        btn =>
+          btn.classList.remove(
+            "active"
+          )
       );
+
 
     const nav =
       document.getElementById(
         "nav-" + section
       );
 
+
     if (nav) {
-      nav.classList.add("active");
+
+      nav.classList.add(
+        "active"
+      );
+
     }
+
 
     window.scrollTo({
       top: 0,
@@ -1067,17 +1444,38 @@
 
   function openTransaction(type) {
 
-    showSection("transactions");
+    showSection(
+      "transactions"
+    );
 
-    document.getElementById(
-      "txType"
-    ).value = type;
+
+    const txType =
+      document.getElementById(
+        "txType"
+      );
+
+
+    if (txType) {
+
+      txType.value = type;
+
+    }
+
 
     toggleCategory();
 
-    document.getElementById(
-      "txAmount"
-    ).focus();
+
+    const amount =
+      document.getElementById(
+        "txAmount"
+      );
+
+
+    if (amount) {
+
+      amount.focus();
+
+    }
 
   }
 
@@ -1088,14 +1486,33 @@
 
   function toggleCategory() {
 
-    const type =
+    const typeElement =
       document.getElementById(
         "txType"
-      ).value;
+      );
 
-    document.getElementById(
-      "categoryGroup"
-    ).style.display =
+
+    const categoryGroup =
+      document.getElementById(
+        "categoryGroup"
+      );
+
+
+    if (
+      !typeElement ||
+      !categoryGroup
+    ) {
+
+      return;
+
+    }
+
+
+    const type =
+      typeElement.value;
+
+
+    categoryGroup.style.display =
       type === "income"
         ? "none"
         : "block";
@@ -1114,12 +1531,14 @@
         "txType"
       ).value;
 
+
     const amount =
       parseFloat(
         document.getElementById(
           "txAmount"
         ).value
       );
+
 
     const category =
       type === "income"
@@ -1128,13 +1547,15 @@
             "txCategory"
           ).value;
 
+
     const description =
       document.getElementById(
         "txDesc"
       ).value.trim();
 
+
     if (
-      !amount ||
+      !isFinite(amount) ||
       amount <= 0
     ) {
 
@@ -1174,12 +1595,15 @@
       "txAmount"
     ).value = "";
 
+
     document.getElementById(
       "txDesc"
     ).value = "";
 
 
-    showSection("dashboard");
+    showSection(
+      "dashboard"
+    );
 
   }
 
@@ -1194,6 +1618,7 @@
       state.transactions.filter(
         t => t.id !== id
       );
+
 
     saveData();
 
@@ -1213,8 +1638,9 @@
         ).value
       );
 
+
     if (
-      isNaN(amount) ||
+      !isFinite(amount) ||
       amount < 0
     ) {
 
@@ -1226,7 +1652,10 @@
 
     }
 
-    state.budget = amount;
+
+    state.budget =
+      amount;
+
 
     saveData();
 
@@ -1244,6 +1673,7 @@
         "goalTitle"
       ).value.trim();
 
+
     const target =
       parseFloat(
         document.getElementById(
@@ -1254,7 +1684,7 @@
 
     if (
       !title ||
-      !target ||
+      !isFinite(target) ||
       target <= 0
     ) {
 
@@ -1287,6 +1717,7 @@
       "goalTitle"
     ).value = "";
 
+
     document.getElementById(
       "goalTarget"
     ).value = "";
@@ -1300,18 +1731,33 @@
 
   function depositToGoal(id) {
 
-    const amount =
-      parseFloat(
-        prompt(
-          "How much do you want to save toward this goal?"
-        )
+    const input =
+      prompt(
+        "How much do you want to save toward this goal?"
       );
 
 
     if (
-      !amount ||
+      input === null
+    ) {
+
+      return;
+
+    }
+
+
+    const amount =
+      parseFloat(input);
+
+
+    if (
+      !isFinite(amount) ||
       amount <= 0
     ) {
+
+      alert(
+        "Please enter a valid amount."
+      );
 
       return;
 
@@ -1325,11 +1771,15 @@
 
 
     if (!goal) {
+
       return;
+
     }
 
 
-    goal.saved += amount;
+    goal.saved =
+      Number(goal.saved || 0) +
+      amount;
 
 
     state.transactions.unshift({
@@ -1363,10 +1813,28 @@
 
   function changeCurrency() {
 
-    state.currency =
+    const select =
       document.getElementById(
         "currencySelect"
-      ).value;
+      );
+
+
+    if (!select) {
+
+      return;
+
+    }
+
+
+    const selected =
+      normalizeCurrency(
+        select.value
+      );
+
+
+    state.currency =
+      selected;
+
 
     saveData();
 
@@ -1391,6 +1859,7 @@
 
 
     state.transactions = [];
+
 
     saveData();
 
@@ -1422,7 +1891,7 @@
 
       goals: [],
 
-      currency: "$"
+      currency: "USD"
 
     };
 
@@ -1442,6 +1911,7 @@
       t.type === "income"
         ? "+"
         : "-";
+
 
     const color =
       t.type === "income"
@@ -1541,21 +2011,32 @@
     state.transactions.forEach(
       transaction => {
 
+        const amount =
+          Number(
+            transaction.amount
+          );
+
+
+        if (
+          !isFinite(amount)
+        ) {
+
+          return;
+
+        }
+
+
         if (
           transaction.type === "income"
         ) {
 
           income +=
-            Number(
-              transaction.amount
-            );
+            amount;
 
         } else {
 
           expenses +=
-            Number(
-              transaction.amount
-            );
+            amount;
 
 
           categories[
@@ -1566,9 +2047,7 @@
                 transaction.category
               ] || 0
             ) +
-            Number(
-              transaction.amount
-            );
+            amount;
 
         }
 
@@ -1621,6 +2100,7 @@
         "dashboardTransactions"
       );
 
+
     const all =
       document.getElementById(
         "allTransactions"
@@ -1634,6 +2114,7 @@
       dashboard.innerHTML =
         '<div class="empty">No transactions recorded yet.</div>';
 
+
       all.innerHTML =
         '<div class="empty">No transactions recorded yet.</div>';
 
@@ -1642,13 +2123,17 @@
       dashboard.innerHTML =
         state.transactions
           .slice(0, 5)
-          .map(transactionHTML)
+          .map(
+            transactionHTML
+          )
           .join("");
 
 
       all.innerHTML =
         state.transactions
-          .map(transactionHTML)
+          .map(
+            transactionHTML
+          )
           .join("");
 
     }
@@ -1660,6 +2145,7 @@
       document.getElementById(
         "budgetText"
       );
+
 
     const budgetProgress =
       document.getElementById(
@@ -1699,6 +2185,7 @@
       budgetText.textContent =
         "No budget set.";
 
+
       budgetProgress.style.width =
         "0%";
 
@@ -1724,63 +2211,81 @@
 
       goals.innerHTML =
         state.goals
-          .map(goal => {
+          .map(
+            goal => {
 
-            const percentage =
-              Math.min(
-                100,
-                (
-                  goal.saved /
-                  goal.target
-                ) *
-                100
-              );
+              const saved =
+                Number(
+                  goal.saved || 0
+                );
 
 
-            return `
+              const target =
+                Number(
+                  goal.target || 0
+                );
 
-              <div class="goal">
 
-                <div class="goal-top">
+              const percentage =
+                target > 0
+                  ? Math.min(
+                      100,
+                      (
+                        saved /
+                        target
+                      ) *
+                      100
+                    )
+                  : 0;
 
-                  <div class="goal-name">
-                    ${escapeHTML(goal.title)}
+
+              return `
+
+                <div class="goal">
+
+                  <div class="goal-top">
+
+                    <div class="goal-name">
+                      ${escapeHTML(
+                        goal.title
+                      )}
+                    </div>
+
+                    <div class="goal-number">
+                      ${money(saved)}
+                      /
+                      ${money(target)}
+                    </div>
+
+                  </div>
+
+                  <div class="progress">
+
+                    <div
+                      class="progress-fill"
+                      style="width:${percentage}%">
+                    </div>
+
                   </div>
 
                   <div class="goal-number">
-                    ${money(goal.saved)}
-                    /
-                    ${money(goal.target)}
+                    ${percentage.toFixed(1)}% complete
                   </div>
 
+                  <br>
+
+                  <button
+                    class="goal-btn"
+                    onclick="depositToGoal(${goal.id})">
+                    ＋ Add Money
+                  </button>
+
                 </div>
 
-                <div class="progress">
+              `;
 
-                  <div
-                    class="progress-fill"
-                    style="width:${percentage}%">
-                  </div>
-
-                </div>
-
-                <div class="goal-number">
-                  ${percentage.toFixed(1)}% complete
-                </div>
-
-                <br>
-
-                <button
-                  class="goal-btn"
-                  onclick="depositToGoal(${goal.id})">
-                  ＋ Add Money
-                </button>
-
-              </div>
-
-            `;
-
-          })
+            }
+          )
           .join("");
 
     }
@@ -1806,28 +2311,32 @@
       money(balance);
 
 
-    let topCategory = "N/A";
+    let topCategory =
+      "N/A";
+
 
     let highest = 0;
 
 
     Object.keys(categories)
-      .forEach(category => {
+      .forEach(
+        category => {
 
-        if (
-          categories[category] >
-          highest
-        ) {
+          if (
+            categories[category] >
+            highest
+          ) {
 
-          highest =
-            categories[category];
+            highest =
+              categories[category];
 
-          topCategory =
-            category;
+            topCategory =
+              category;
+
+          }
 
         }
-
-      });
+      );
 
 
     document.getElementById(
@@ -1848,10 +2357,13 @@
         "currencySelect"
       );
 
+
     if (currencySelect) {
 
       currencySelect.value =
-        state.currency || "$";
+        normalizeCurrency(
+          state.currency
+        );
 
     }
 
@@ -1868,6 +2380,13 @@
       document.getElementById(
         "insightsContent"
       );
+
+
+    if (!box) {
+
+      return;
+
+    }
 
 
     if (
@@ -1898,23 +2417,38 @@
     state.transactions.forEach(
       t => {
 
+        const amount =
+          Number(t.amount);
+
+
+        if (
+          !isFinite(amount)
+        ) {
+
+          return;
+
+        }
+
+
         if (
           t.type === "income"
         ) {
 
           income +=
-            Number(t.amount);
+            amount;
 
         } else {
 
           expenses +=
-            Number(t.amount);
+            amount;
+
 
           categories[t.category] =
             (
-              categories[t.category] || 0
+              categories[t.category] ||
+              0
             ) +
-            Number(t.amount);
+            amount;
 
         }
 
@@ -1922,28 +2456,32 @@
     );
 
 
-    let topCategory = "N/A";
+    let topCategory =
+      "N/A";
+
 
     let highest = 0;
 
 
     Object.keys(categories)
-      .forEach(category => {
+      .forEach(
+        category => {
 
-        if (
-          categories[category] >
-          highest
-        ) {
+          if (
+            categories[category] >
+            highest
+          ) {
 
-          highest =
-            categories[category];
+            highest =
+              categories[category];
 
-          topCategory =
-            category;
+            topCategory =
+              category;
+
+          }
 
         }
-
-      });
+      );
 
 
     const savings =
@@ -1985,12 +2523,26 @@
 
 
     if (
+      savings === 0 &&
+      income > 0 &&
+      expenses > 0
+    ) {
+
+      message +=
+        "ℹ️ Your recorded income and expenses are currently equal.<br><br>";
+
+    }
+
+
+    if (
       topCategory !== "N/A"
     ) {
 
       message +=
         "🔎 Your biggest expense category is <strong>" +
-        escapeHTML(topCategory) +
+        escapeHTML(
+          topCategory
+        ) +
         "</strong> at " +
         money(highest) +
         ".<br><br>";
@@ -2020,7 +2572,16 @@
     }
 
 
-    box.innerHTML = message;
+    if (!message) {
+
+      message =
+        "🧠 Keep recording your transactions so Money Brain can learn more about your spending.";
+
+    }
+
+
+    box.innerHTML =
+      message;
 
   }
 
