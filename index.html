@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finance Tracker Mini App</title>
+  <!-- Telegram Web App JS SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-color: var(--tg-theme-bg-color, #f4f6f8);
+      --text-color: var(--tg-theme-text-color, #333333);
+      --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+      --button-color: var(--tg-theme-button-color, #0088cc);
+      --button-text: var(--tg-theme-button-text-color, #ffffff);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 16px;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .balance-title { font-size: 0.85rem; color: #888; }
+    .balance-amount { font-size: 1.8rem; font-weight: bold; margin: 4px 0 12px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-box { background: rgba(0, 0, 0, 0.03); padding: 10px; border-radius: 8px; }
+    .stat-label { font-size: 0.75rem; color: #666; }
+    .stat-value { font-weight: bold; font-size: 1rem; }
+    .income { color: #2e7d32; }
+    .expense { color: #c62828; }
+    .nav-tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; }
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid #ddd;
+      padding: 8px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .tab-btn.active {
+      background: var(--button-color);
+      color: var(--button-text);
+      border-color: var(--button-color);
+    }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 0.8rem; margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--button-color);
+      color: var(--button-text);
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-danger { background-color: #d32f2f; }
+    .hidden { display: none; }
+    .transaction-item, .goal-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .progress-bar {
+      height: 8px;
+      background: #eee;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .progress-fill { height: 100%; background: var(--button-color); width: 0%; }
+  </style>
+</head>
+<body>
+
+  <!-- Dashboard Overview Header -->
+  <div class="card">
+    <div class="balance-title">Total Available Balance</div>
+    <div class="balance-amount" id="totalBalance">$0.00</div>
+    <div class="grid-2">
+      <div class="stat-box">
+        <div class="stat-label">Income</div>
+        <div class="stat-value income" id="totalIncome">+$0.00</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Expenses</div>
+        <div class="stat-value expense" id="totalExpense">-$0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showSection('dashboard', event)">Dashboard</button>
+    <button class="tab-btn" onclick="showSection('add-tx', event)">Add Transaction</button>
+    <button class="tab-btn" onclick="showSection('budget', event)">Budget</button>
+    <button class="tab-btn" onclick="showSection('goals', event)">Goals</button>
+    <button class="tab-btn" onclick="showSection('reports', event)">Reports</button>
+    <button class="tab-btn" onclick="showSection('settings', event)">Settings</button>
+  </div>
+
+  <!-- SECTION: Dashboard -->
+  <div id="sec-dashboard" class="card">
+    <h3>Recent Transactions</h3>
+    <div id="transactionList">No transactions recorded yet.</div>
+  </div>
+
+  <!-- SECTION: Add Income / Expense -->
+  <div id="sec-add-tx" class="card hidden">
+    <h3>Add Income / Expense</h3>
+    <div class="form-group">
+      <label>Type</label>
+      <select id="txType" onchange="toggleCategorySelect()">
+        <option value="expense">Expense</option>
+        <option value="income">Income</option>
+      </select>
+    </div>
+    <div class="form-group" id="categoryGroup">
+      <label>Category</label>
+      <select id="txCategory">
+        <option value="Food">Food</option>
+        <option value="Bills">Bills</option>
+        <option value="Education">Education</option>
+        <option value="Shopping">Shopping</option>
+        <option value="Entertainment">Entertainment</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Amount</label>
+      <input type="number" id="txAmount" placeholder="0.00" />
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" id="txDesc" placeholder="e.g. Lunch, Salary" />
+    </div>
+    <button class="btn" onclick="addTransaction()">Save Transaction</button>
+  </div>
+
+  <!-- SECTION: Budget -->
+  <div id="sec-budget" class="card hidden">
+    <h3>Monthly Budget Setup</h3>
+    <div class="form-group">
+      <label>Monthly Spending Target</label>
+      <input type="number" id="budgetLimit" placeholder="Enter budget limit" />
+    </div>
+    <button class="btn" onclick="saveBudget()">Set Budget</button>
+    <div style="margin-top: 16px;">
+      <strong>Current Budget Status:</strong>
+      <p id="budgetText">No budget set.</p>
+    </div>
+  </div>
+
+  <!-- SECTION: Goals -->
+  <div id="sec-goals" class="card hidden">
+    <h3>Savings Goals</h3>
+    <div class="form-group">
+      <label>Goal Name</label>
+      <input type="text" id="goalTitle" placeholder="e.g. New Phone" />
+    </div>
+    <div class="form-group">
+      <label>Target Amount</label>
+      <input type="number" id="goalTarget" placeholder="e.g. 800" />
+    </div>
+    <button class="btn" onclick="createGoal()">Create Goal</button>
+
+    <h4 style="margin-top:20px;">Your Active Goals</h4>
+    <div id="goalsList">No active goals.</div>
+  </div>
+
+  <!-- SECTION: Monthly Reports -->
+  <div id="sec-reports" class="card hidden">
+    <h3>Monthly Summary Report</h3>
+    <p><strong>Net Savings:</strong> <span id="reportSavings">$0.00</span></p>
+    <p><strong>Top Expense Category:</strong> <span id="reportTopCategory">N/A</span></p>
+  </div>
+
+  <!-- SECTION: Settings / Reset -->
+  <div id="sec-settings" class="card hidden">
+    <h3>Data Management</h3>
+    <button class="btn btn-danger" style="margin-bottom: 10px;" onclick="clearHistory()">Clear Transaction History</button>
+    <button class="btn btn-danger" onclick="resetAllData()">Reset All App Data</button>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) tg.expand();
+
+    let state = JSON.parse(localStorage.getItem('financeData')) || {
+      transactions: [],
+      budget: 0,
+      goals: []
+    };
+
+    function saveData() {
+      localStorage.setItem('financeData', JSON.stringify(state));
+      updateUI();
+    }
+
+    function showSection(sectionId, evt) {
+      const sections = ['dashboard', 'add-tx', 'budget', 'goals', 'reports', 'settings'];
+      sections.forEach(s => document.getElementById(`sec-${s}`).classList.add('hidden'));
+      document.getElementById(`sec-${sectionId}`).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      if (evt) evt.target.classList.add('active');
+    }
+
+    function toggleCategorySelect() {
+      const type = document.getElementById('txType').value;
+      document.getElementById('categoryGroup').style.display = type === 'income' ? 'none' : 'block';
+    }
+
+    function addTransaction() {
+      const type = document.getElementById('txType').value;
+      const category = type === 'income' ? 'Income' : document.getElementById('txCategory').value;
+      const amount = parseFloat(document.getElementById('txAmount').value);
+      const desc = document.getElementById('txDesc').value || category;
+
+      if (!amount || amount <= 0) return alert('Enter a valid amount');
+
+      state.transactions.unshift({ id: Date.now(), type, category, amount, desc, date: new Date().toLocaleDateString() });
+      saveData();
+      
+      document.getElementById('txAmount').value = '';
+      document.getElementById('txDesc').value = '';
+      showSection('dashboard');
+    }
+
+    function deleteTransaction(id) {
+      state.transactions = state.transactions.filter(t => t.id !== id);
+      saveData();
+    }
+
+    function saveBudget() {
+      const val = parseFloat(document.getElementById('budgetLimit').value);
+      if (val >= 0) {
+        state.budget = val;
+        saveData();
+      }
+    }
+
+    function createGoal() {
+      const title = document.getElementById('goalTitle').value;
+      const target = parseFloat(document.getElementById('goalTarget').value);
+      if (!title || !target) return alert('Provide goal name and amount');
+
+      state.goals.push({ id: Date.now(), title, target, saved: 0 });
+      saveData();
+      document.getElementById('goalTitle').value = '';
+      document.getElementById('goalTarget').value = '';
+    }
+
+    function depositToGoal(id) {
+      const amount = parseFloat(prompt('Enter amount to save towards this goal:'));
+      if (amount && amount > 0) {
+        const goal = state.goals.find(g => g.id === id);
+        if (goal) {
+          goal.saved += amount;
+          state.transactions.unshift({
+            id: Date.now(),
+            type: 'expense',
+            category: 'Savings',
+            amount: amount,
+            desc: `Deposit to ${goal.title}`,
+            date: new Date().toLocaleDateString()
+          });
+          saveData();
+        }
+      }
+    }
+
+    function clearHistory() {
+      if (confirm('Clear all transaction history?')) {
+        state.transactions = [];
+        saveData();
+      }
+    }
+
+    function resetAllData() {
+      if (confirm('Reset all app data, including budget and goals?')) {
+        state = { transactions: [], budget: 0, goals: [] };
+        saveData();
+      }
+    }
+
+    function updateUI() {
+      let income = 0, expense = 0;
+      const categories = {};
+
+      state.transactions.forEach(t => {
+        if (t.type === 'income') {
+          income += t.amount;
+        } else {
+          expense += t.amount;
+          categories[t.category] = (categories[t.category] || 0) + t.amount;
+        }
+      });
+
+      const balance = income - expense;
+
+      document.getElementById('totalBalance').textContent = `$${balance.toFixed(2)}`;
+      document.getElementById('totalIncome').textContent = `+$${income.toFixed(2)}`;
+      document.getElementById('totalExpense').textContent = `-$${expense.toFixed(2)}`;
+
+      const txList = document.getElementById('transactionList');
+      if (state.transactions.length === 0) {
+        txList.innerHTML = '<p>No transactions recorded yet.</p>';
+      } else {
+        txList.innerHTML = state.transactions.map(t => `
+          <div class="transaction-item">
+            <div>
+              <strong>${t.desc}</strong> <small>(${t.category})</small><br/>
+              <small style="color:#888;">${t.date}</small>
+            </div>
+            <div>
+              <span class="${t.type}">${t.type === 'income' ? '+' : '-'}$${t.amount.toFixed(2)}</span>
+              <button style="margin-left:8px; border:none; background:none; color:red;" onclick="deleteTransaction(${t.id})">✕</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('budgetText').textContent = state.budget > 0 
+        ? `$${expense.toFixed(2)} spent of $${state.budget.toFixed(2)} budget (${((expense/state.budget)*100).toFixed(1)}%)`
+        : 'No active budget set.';
+
+      const goalsContainer = document.getElementById('goalsList');
+      if (state.goals.length === 0) {
+        goalsContainer.innerHTML = '<p>No goals added yet.</p>';
+      } else {
+        goalsContainer.innerHTML = state.goals.map(g => {
+          const pct = Math.min(100, ((g.saved / g.target) * 100)).toFixed(1);
+          return `
+            <div class="goal-item" style="flex-direction: column; align-items: flex-start; width:100%;">
+              <div style="display:flex; justify-content:space-between; width:100%;">
+                <strong>${g.title}</strong>
+                <span>$${g.saved.toFixed(2)} / $${g.target.toFixed(2)}</span>
+              </div>
+              <div class="progress-bar" style="width:100%;">
+                <div class="progress-fill" style="width: ${pct}%;"></div>
+              </div>
+              <button class="btn" style="margin-top:8px; padding:6px;" onclick="depositToGoal(${g.id})">+ Deposit Money</button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('reportSavings').textContent = `$${(income - expense).toFixed(2)}`;
+      
+      let topCat = 'N/A';
+      let maxSpent = 0;
+      for (const cat in categories) {
+        if (categories[cat] > maxSpent) {
+          maxSpent = categories[cat];
+          topCat = cat;
+        }
+      }
+      document.getElementById('reportTopCategory').textContent = topCat;
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
