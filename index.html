@@ -3,381 +3,2037 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Finance Tracker Mini App</title>
-  <!-- Telegram Web App JS SDK -->
+  <title>Money Brain</title>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
     :root {
-      --bg-color: var(--tg-theme-bg-color, #f4f6f8);
-      --text-color: var(--tg-theme-text-color, #333333);
-      --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
-      --button-color: var(--tg-theme-button-color, #0088cc);
-      --button-text: var(--tg-theme-button-text-color, #ffffff);
+      --bg: var(--tg-theme-bg-color, #0f1720);
+      --card: var(--tg-theme-secondary-bg-color, #17212b);
+      --card2: #1d2a36;
+      --text: var(--tg-theme-text-color, #ffffff);
+      --muted: #8d99a6;
+      --primary: var(--tg-theme-button-color, #2ea6ff);
+      --primary-text: var(--tg-theme-button-text-color, #ffffff);
+      --green: #32d74b;
+      --red: #ff453a;
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 8px 24px rgba(0,0,0,0.18);
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 16px;
-    }
-    .card {
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .balance-title { font-size: 0.85rem; color: #888; }
-    .balance-amount { font-size: 1.8rem; font-weight: bold; margin: 4px 0 12px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .stat-box { background: rgba(0, 0, 0, 0.03); padding: 10px; border-radius: 8px; }
-    .stat-label { font-size: 0.75rem; color: #666; }
-    .stat-value { font-weight: bold; font-size: 1rem; }
-    .income { color: #2e7d32; }
-    .expense { color: #c62828; }
-    .nav-tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; }
-    .tab-btn {
-      background: var(--card-bg);
-      border: 1px solid #ddd;
-      padding: 8px 14px;
-      border-radius: 20px;
-      white-space: nowrap;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .tab-btn.active {
-      background: var(--button-color);
-      color: var(--button-text);
-      border-color: var(--button-color);
-    }
-    .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 0.8rem; margin-bottom: 4px; }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+
+    * {
       box-sizing: border-box;
     }
-    .btn {
-      width: 100%;
-      padding: 12px;
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 40px;
+    }
+
+    /* HEADER */
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brain-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      font-size: 23px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* BALANCE CARD */
+
+    .balance-card {
+      background:
+        linear-gradient(
+          145deg,
+          var(--card2),
+          var(--card)
+        );
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .balance-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .balance {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+
+    .money-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .money-box {
+      background: rgba(255,255,255,0.045);
+      border-radius: 14px;
+      padding: 13px;
+    }
+
+    .money-box-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .money-box-value {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .income {
+      color: var(--green);
+    }
+
+    .expense {
+      color: var(--red);
+    }
+
+    /* QUICK ACTIONS */
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .quick-btn {
       border: none;
-      border-radius: 8px;
-      background-color: var(--button-color);
-      color: var(--button-text);
-      font-weight: bold;
+      border-radius: 15px;
+      padding: 14px 10px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+    }
+
+    .income-btn {
+      background: #1f8f3a;
+    }
+
+    .expense-btn {
+      background: #c93630;
+    }
+
+    /* NAVIGATION */
+
+    .nav {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .nav button {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 5px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .nav button.active {
+      background: var(--primary);
+      color: var(--primary-text);
+      border-color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* SECTIONS */
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 5px;
+      font-size: 18px;
+    }
+
+    .card-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    /* FORM */
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--card2);
+      color: var(--text);
+      padding: 13px;
+      border-radius: 12px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+    }
+
+    .main-btn {
+      width: 100%;
+      border: none;
+      background: var(--primary);
+      color: var(--primary-text);
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
       cursor: pointer;
     }
-    .btn-danger { background-color: #d32f2f; }
-    .hidden { display: none; }
-    .transaction-item, .goal-item {
+
+    .danger-btn {
+      background: #b52d2d;
+      color: white;
+    }
+
+    /* TRANSACTIONS */
+
+    .transaction {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
+      gap: 10px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
     }
-    .progress-bar {
+
+    .transaction:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .transaction-meta {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .transaction-amount {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--red);
+      cursor: pointer;
+      margin-left: 6px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 25px 10px;
+      font-size: 13px;
+    }
+
+    /* GOALS */
+
+    .goal {
+      background: var(--card2);
+      padding: 14px;
+      border-radius: 14px;
+      margin-bottom: 12px;
+    }
+
+    .goal-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+
+    .goal-name {
+      font-weight: 700;
+    }
+
+    .goal-number {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .progress {
       height: 8px;
-      background: #eee;
-      border-radius: 4px;
+      background: rgba(255,255,255,0.10);
+      border-radius: 20px;
       overflow: hidden;
-      margin-top: 6px;
+      margin: 9px 0;
     }
-    .progress-fill { height: 100%; background: var(--button-color); width: 0%; }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 20px;
+    }
+
+    .goal-btn {
+      width: 100%;
+      border: none;
+      background: var(--primary);
+      color: var(--primary-text);
+      border-radius: 10px;
+      padding: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* STAT CARDS */
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      background: var(--card2);
+      border-radius: 14px;
+      padding: 15px;
+    }
+
+    .stat-title {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    /* FOOTER */
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 25px;
+    }
+
+    @media (max-width: 380px) {
+      .nav {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .balance {
+        font-size: 30px;
+      }
+    }
   </style>
 </head>
+
 <body>
 
-  <!-- Dashboard Overview Header -->
-  <div class="card">
-    <div class="balance-title">Total Available Balance</div>
-    <div class="balance-amount" id="totalBalance">$0.00</div>
-    <div class="grid-2">
-      <div class="stat-box">
-        <div class="stat-label">Income</div>
-        <div class="stat-value income" id="totalIncome">+$0.00</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Expenses</div>
-        <div class="stat-value expense" id="totalExpense">-$0.00</div>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="brain-icon">🧠</div>
+      <div>
+        <h1>Money Brain</h1>
+        <p>Your personal money tracker</p>
       </div>
     </div>
   </div>
 
-  <!-- Navigation Buttons -->
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="showSection('dashboard', event)">Dashboard</button>
-    <button class="tab-btn" onclick="showSection('add-tx', event)">Add Transaction</button>
-    <button class="tab-btn" onclick="showSection('budget', event)">Budget</button>
-    <button class="tab-btn" onclick="showSection('goals', event)">Goals</button>
-    <button class="tab-btn" onclick="showSection('reports', event)">Reports</button>
-    <button class="tab-btn" onclick="showSection('settings', event)">Settings</button>
-  </div>
+  <!-- BALANCE -->
+  <div class="balance-card">
 
-  <!-- SECTION: Dashboard -->
-  <div id="sec-dashboard" class="card">
-    <h3>Recent Transactions</h3>
-    <div id="transactionList">No transactions recorded yet.</div>
-  </div>
+    <div class="balance-label">
+      Total Available Balance
+    </div>
 
-  <!-- SECTION: Add Income / Expense -->
-  <div id="sec-add-tx" class="card hidden">
-    <h3>Add Income / Expense</h3>
-    <div class="form-group">
-      <label>Type</label>
-      <select id="txType" onchange="toggleCategorySelect()">
-        <option value="expense">Expense</option>
-        <option value="income">Income</option>
-      </select>
+    <div class="balance" id="totalBalance">
+      $0.00
     </div>
-    <div class="form-group" id="categoryGroup">
-      <label>Category</label>
-      <select id="txCategory">
-        <option value="Food">Food</option>
-        <option value="Bills">Bills</option>
-        <option value="Education">Education</option>
-        <option value="Shopping">Shopping</option>
-        <option value="Entertainment">Entertainment</option>
-        <option value="Other">Other</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Amount</label>
-      <input type="number" id="txAmount" placeholder="0.00" />
-    </div>
-    <div class="form-group">
-      <label>Description</label>
-      <input type="text" id="txDesc" placeholder="e.g. Lunch, Salary" />
-    </div>
-    <button class="btn" onclick="addTransaction()">Save Transaction</button>
-  </div>
 
-  <!-- SECTION: Budget -->
-  <div id="sec-budget" class="card hidden">
-    <h3>Monthly Budget Setup</h3>
-    <div class="form-group">
-      <label>Monthly Spending Target</label>
-      <input type="number" id="budgetLimit" placeholder="Enter budget limit" />
-    </div>
-    <button class="btn" onclick="saveBudget()">Set Budget</button>
-    <div style="margin-top: 16px;">
-      <strong>Current Budget Status:</strong>
-      <p id="budgetText">No budget set.</p>
+    <div class="money-grid">
+
+      <div class="money-box">
+        <div class="money-box-label">
+          Income
+        </div>
+        <div class="money-box-value income" id="totalIncome">
+          +$0.00
+        </div>
+      </div>
+
+      <div class="money-box">
+        <div class="money-box-label">
+          Expenses
+        </div>
+        <div class="money-box-value expense" id="totalExpense">
+          -$0.00
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- SECTION: Goals -->
-  <div id="sec-goals" class="card hidden">
-    <h3>Savings Goals</h3>
-    <div class="form-group">
-      <label>Goal Name</label>
-      <input type="text" id="goalTitle" placeholder="e.g. New Phone" />
+  <!-- QUICK ACTIONS -->
+  <div class="quick-actions">
+
+    <button
+      class="quick-btn income-btn"
+      onclick="openTransaction('income')">
+      ＋ Add Income
+    </button>
+
+    <button
+      class="quick-btn expense-btn"
+      onclick="openTransaction('expense')">
+      − Add Expense
+    </button>
+
+  </div>
+
+  <!-- NAVIGATION -->
+  <div class="nav">
+
+    <button
+      id="nav-dashboard"
+      class="active"
+      onclick="showSection('dashboard')">
+      🏠 Home
+    </button>
+
+    <button
+      id="nav-transactions"
+      onclick="showSection('transactions')">
+      💳 Money
+    </button>
+
+    <button
+      id="nav-budget"
+      onclick="showSection('budget')">
+      💰 Budget
+    </button>
+
+    <button
+      id="nav-goals"
+      onclick="showSection('goals')">
+      🎯 Goals
+    </button>
+
+    <button
+      id="nav-insights"
+      onclick="showSection('insights')">
+      🧠 Insights
+    </button>
+
+    <button
+      id="nav-reports"
+      onclick="showSection('reports')">
+      📊 Reports
+    </button>
+
+    <button
+      id="nav-settings"
+      onclick="showSection('settings')">
+      ⚙️ Settings
+    </button>
+
+  </div>
+
+  <!-- ================= DASHBOARD ================= -->
+
+  <div id="section-dashboard" class="section active">
+
+    <div class="card">
+
+      <h2>Recent Transactions</h2>
+
+      <div class="card-subtitle">
+        Your latest money activity
+      </div>
+
+      <div id="dashboardTransactions">
+        <div class="empty">
+          No transactions recorded yet.
+        </div>
+      </div>
+
     </div>
-    <div class="form-group">
-      <label>Target Amount</label>
-      <input type="number" id="goalTarget" placeholder="e.g. 800" />
+
+    <div class="card">
+
+      <h2>Money Snapshot</h2>
+
+      <div class="card-subtitle">
+        A quick look at your finances
+      </div>
+
+      <div class="stats">
+
+        <div class="stat">
+          <div class="stat-title">
+            Net Savings
+          </div>
+          <div class="stat-value" id="snapshotSavings">
+            $0.00
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">
+            Transactions
+          </div>
+          <div class="stat-value" id="snapshotTransactions">
+            0
+          </div>
+        </div>
+
+      </div>
+
     </div>
-    <button class="btn" onclick="createGoal()">Create Goal</button>
 
-    <h4 style="margin-top:20px;">Your Active Goals</h4>
-    <div id="goalsList">No active goals.</div>
   </div>
 
-  <!-- SECTION: Monthly Reports -->
-  <div id="sec-reports" class="card hidden">
-    <h3>Monthly Summary Report</h3>
-    <p><strong>Net Savings:</strong> <span id="reportSavings">$0.00</span></p>
-    <p><strong>Top Expense Category:</strong> <span id="reportTopCategory">N/A</span></p>
+  <!-- ================= TRANSACTIONS ================= -->
+
+  <div id="section-transactions" class="section">
+
+    <div class="card">
+
+      <h2>Add Transaction</h2>
+
+      <div class="card-subtitle">
+        Record money coming in or going out
+      </div>
+
+      <div class="form-group">
+
+        <label>Transaction Type</label>
+
+        <select id="txType" onchange="toggleCategory()">
+
+          <option value="expense">
+            Expense
+          </option>
+
+          <option value="income">
+            Income
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group" id="categoryGroup">
+
+        <label>Category</label>
+
+        <select id="txCategory">
+
+          <option>Food</option>
+          <option>Bills</option>
+          <option>Transport</option>
+          <option>Education</option>
+          <option>Shopping</option>
+          <option>Entertainment</option>
+          <option>Health</option>
+          <option>Family</option>
+          <option>Other</option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Amount</label>
+
+        <input
+          type="number"
+          id="txAmount"
+          placeholder="Enter amount"
+          min="0"
+        />
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Description</label>
+
+        <input
+          type="text"
+          id="txDesc"
+          placeholder="e.g. Salary, food, transport"
+        />
+
+      </div>
+
+      <button
+        class="main-btn"
+        onclick="addTransaction()">
+        Save Transaction
+      </button>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Transaction History</h2>
+
+      <div class="card-subtitle">
+        Everything you have recorded
+      </div>
+
+      <div id="allTransactions">
+        <div class="empty">
+          No transactions recorded yet.
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
-  <!-- SECTION: Settings / Reset -->
-  <div id="sec-settings" class="card hidden">
-    <h3>Data Management</h3>
-    <button class="btn btn-danger" style="margin-bottom: 10px;" onclick="clearHistory()">Clear Transaction History</button>
-    <button class="btn btn-danger" onclick="resetAllData()">Reset All App Data</button>
+  <!-- ================= BUDGET ================= -->
+
+  <div id="section-budget" class="section">
+
+    <div class="card">
+
+      <h2>Monthly Budget</h2>
+
+      <div class="card-subtitle">
+        Set the maximum amount you want to spend
+      </div>
+
+      <div class="form-group">
+
+        <label>Monthly Spending Target</label>
+
+        <input
+          type="number"
+          id="budgetLimit"
+          placeholder="Enter budget"
+          min="0"
+        />
+
+      </div>
+
+      <button
+        class="main-btn"
+        onclick="saveBudget()">
+        Set Budget
+      </button>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Budget Status</h2>
+
+      <div id="budgetText" class="card-subtitle">
+        No budget set.
+      </div>
+
+      <div class="progress">
+        <div
+          id="budgetProgress"
+          class="progress-fill"
+          style="width:0%">
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
-  <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) tg.expand();
+  <!-- ================= GOALS ================= -->
 
-    let state = JSON.parse(localStorage.getItem('financeData')) || {
+  <div id="section-goals" class="section">
+
+    <div class="card">
+
+      <h2>Savings Goals</h2>
+
+      <div class="card-subtitle">
+        Give your money something to work toward
+      </div>
+
+      <div class="form-group">
+
+        <label>Goal Name</label>
+
+        <input
+          type="text"
+          id="goalTitle"
+          placeholder="e.g. New Phone"
+        />
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Target Amount</label>
+
+        <input
+          type="number"
+          id="goalTarget"
+          placeholder="Enter target"
+          min="0"
+        />
+
+      </div>
+
+      <button
+        class="main-btn"
+        onclick="createGoal()">
+        Create Savings Goal
+      </button>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Your Goals</h2>
+
+      <div id="goalsList">
+        <div class="empty">
+          No savings goals yet.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= INSIGHTS ================= -->
+
+  <div id="section-insights" class="section">
+
+    <div class="card">
+
+      <h2>🧠 Money Insights</h2>
+
+      <div class="card-subtitle">
+        Understand what your money is doing
+      </div>
+
+      <div id="insightsContent">
+
+        <div class="empty">
+          Add some transactions and Money Brain will analyze them.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= REPORTS ================= -->
+
+  <div id="section-reports" class="section">
+
+    <div class="card">
+
+      <h2>📊 Money Report</h2>
+
+      <div class="card-subtitle">
+        Your overall financial picture
+      </div>
+
+      <div class="stats">
+
+        <div class="stat">
+          <div class="stat-title">
+            Total Income
+          </div>
+
+          <div
+            class="stat-value income"
+            id="reportIncome">
+            $0.00
+          </div>
+
+        </div>
+
+        <div class="stat">
+
+          <div class="stat-title">
+            Total Expenses
+          </div>
+
+          <div
+            class="stat-value expense"
+            id="reportExpense">
+            $0.00
+          </div>
+
+        </div>
+
+        <div class="stat">
+
+          <div class="stat-title">
+            Net Savings
+          </div>
+
+          <div
+            class="stat-value"
+            id="reportSavings">
+            $0.00
+          </div>
+
+        </div>
+
+        <div class="stat">
+
+          <div class="stat-title">
+            Top Expense
+          </div>
+
+          <div
+            class="stat-value"
+            id="reportTopCategory">
+            N/A
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= SETTINGS ================= -->
+
+  <div id="section-settings" class="section">
+
+    <div class="card">
+
+      <h2>⚙️ Settings</h2>
+
+      <div class="card-subtitle">
+        Manage your Money Brain data
+      </div>
+
+      <div class="form-group">
+
+        <label>Currency Symbol</label>
+
+        <select id="currencySelect" onchange="changeCurrency()">
+
+          <option value="$">$ — US Dollar</option>
+          <option value="₦">₦ — Nigerian Naira</option>
+          <option value="£">£ — British Pound</option>
+          <option value="€">€ — Euro</option>
+          <option value="R">R — South African Rand</option>
+          <option value="KSh">KSh — Kenyan Shilling</option>
+          <option value="GH₵">GH₵ — Ghanaian Cedi</option>
+
+        </select>
+
+      </div>
+
+      <button
+        class="main-btn danger-btn"
+        onclick="clearHistory()">
+        Clear Transaction History
+      </button>
+
+      <br><br>
+
+      <button
+        class="main-btn danger-btn"
+        onclick="resetAllData()">
+        Reset All Money Brain Data
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="footer">
+    🧠 Money Brain — Know where your money goes.
+  </div>
+
+</div>
+
+
+<script>
+
+  /* =========================================
+     TELEGRAM
+  ========================================= */
+
+  const tg = window.Telegram?.WebApp;
+
+  if (tg) {
+    tg.ready();
+    tg.expand();
+  }
+
+
+  /* =========================================
+     DATA
+  ========================================= */
+
+  let state =
+    JSON.parse(
+      localStorage.getItem("moneyBrainData")
+    ) || {
+
       transactions: [],
       budget: 0,
-      goals: []
+      goals: [],
+      currency: "$"
+
     };
 
-    function saveData() {
-      localStorage.setItem('financeData', JSON.stringify(state));
-      updateUI();
-    }
 
-    function showSection(sectionId, evt) {
-      const sections = ['dashboard', 'add-tx', 'budget', 'goals', 'reports', 'settings'];
-      sections.forEach(s => document.getElementById(`sec-${s}`).classList.add('hidden'));
-      document.getElementById(`sec-${sectionId}`).classList.remove('hidden');
+  /* =========================================
+     SAVE DATA
+  ========================================= */
 
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      if (evt) evt.target.classList.add('active');
-    }
+  function saveData() {
 
-    function toggleCategorySelect() {
-      const type = document.getElementById('txType').value;
-      document.getElementById('categoryGroup').style.display = type === 'income' ? 'none' : 'block';
-    }
-
-    function addTransaction() {
-      const type = document.getElementById('txType').value;
-      const category = type === 'income' ? 'Income' : document.getElementById('txCategory').value;
-      const amount = parseFloat(document.getElementById('txAmount').value);
-      const desc = document.getElementById('txDesc').value || category;
-
-      if (!amount || amount <= 0) return alert('Enter a valid amount');
-
-      state.transactions.unshift({ id: Date.now(), type, category, amount, desc, date: new Date().toLocaleDateString() });
-      saveData();
-      
-      document.getElementById('txAmount').value = '';
-      document.getElementById('txDesc').value = '';
-      showSection('dashboard');
-    }
-
-    function deleteTransaction(id) {
-      state.transactions = state.transactions.filter(t => t.id !== id);
-      saveData();
-    }
-
-    function saveBudget() {
-      const val = parseFloat(document.getElementById('budgetLimit').value);
-      if (val >= 0) {
-        state.budget = val;
-        saveData();
-      }
-    }
-
-    function createGoal() {
-      const title = document.getElementById('goalTitle').value;
-      const target = parseFloat(document.getElementById('goalTarget').value);
-      if (!title || !target) return alert('Provide goal name and amount');
-
-      state.goals.push({ id: Date.now(), title, target, saved: 0 });
-      saveData();
-      document.getElementById('goalTitle').value = '';
-      document.getElementById('goalTarget').value = '';
-    }
-
-    function depositToGoal(id) {
-      const amount = parseFloat(prompt('Enter amount to save towards this goal:'));
-      if (amount && amount > 0) {
-        const goal = state.goals.find(g => g.id === id);
-        if (goal) {
-          goal.saved += amount;
-          state.transactions.unshift({
-            id: Date.now(),
-            type: 'expense',
-            category: 'Savings',
-            amount: amount,
-            desc: `Deposit to ${goal.title}`,
-            date: new Date().toLocaleDateString()
-          });
-          saveData();
-        }
-      }
-    }
-
-    function clearHistory() {
-      if (confirm('Clear all transaction history?')) {
-        state.transactions = [];
-        saveData();
-      }
-    }
-
-    function resetAllData() {
-      if (confirm('Reset all app data, including budget and goals?')) {
-        state = { transactions: [], budget: 0, goals: [] };
-        saveData();
-      }
-    }
-
-    function updateUI() {
-      let income = 0, expense = 0;
-      const categories = {};
-
-      state.transactions.forEach(t => {
-        if (t.type === 'income') {
-          income += t.amount;
-        } else {
-          expense += t.amount;
-          categories[t.category] = (categories[t.category] || 0) + t.amount;
-        }
-      });
-
-      const balance = income - expense;
-
-      document.getElementById('totalBalance').textContent = `$${balance.toFixed(2)}`;
-      document.getElementById('totalIncome').textContent = `+$${income.toFixed(2)}`;
-      document.getElementById('totalExpense').textContent = `-$${expense.toFixed(2)}`;
-
-      const txList = document.getElementById('transactionList');
-      if (state.transactions.length === 0) {
-        txList.innerHTML = '<p>No transactions recorded yet.</p>';
-      } else {
-        txList.innerHTML = state.transactions.map(t => `
-          <div class="transaction-item">
-            <div>
-              <strong>${t.desc}</strong> <small>(${t.category})</small><br/>
-              <small style="color:#888;">${t.date}</small>
-            </div>
-            <div>
-              <span class="${t.type}">${t.type === 'income' ? '+' : '-'}$${t.amount.toFixed(2)}</span>
-              <button style="margin-left:8px; border:none; background:none; color:red;" onclick="deleteTransaction(${t.id})">✕</button>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      document.getElementById('budgetText').textContent = state.budget > 0 
-        ? `$${expense.toFixed(2)} spent of $${state.budget.toFixed(2)} budget (${((expense/state.budget)*100).toFixed(1)}%)`
-        : 'No active budget set.';
-
-      const goalsContainer = document.getElementById('goalsList');
-      if (state.goals.length === 0) {
-        goalsContainer.innerHTML = '<p>No goals added yet.</p>';
-      } else {
-        goalsContainer.innerHTML = state.goals.map(g => {
-          const pct = Math.min(100, ((g.saved / g.target) * 100)).toFixed(1);
-          return `
-            <div class="goal-item" style="flex-direction: column; align-items: flex-start; width:100%;">
-              <div style="display:flex; justify-content:space-between; width:100%;">
-                <strong>${g.title}</strong>
-                <span>$${g.saved.toFixed(2)} / $${g.target.toFixed(2)}</span>
-              </div>
-              <div class="progress-bar" style="width:100%;">
-                <div class="progress-fill" style="width: ${pct}%;"></div>
-              </div>
-              <button class="btn" style="margin-top:8px; padding:6px;" onclick="depositToGoal(${g.id})">+ Deposit Money</button>
-            </div>
-          `;
-        }).join('');
-      }
-
-      document.getElementById('reportSavings').textContent = `$${(income - expense).toFixed(2)}`;
-      
-      let topCat = 'N/A';
-      let maxSpent = 0;
-      for (const cat in categories) {
-        if (categories[cat] > maxSpent) {
-          maxSpent = categories[cat];
-          topCat = cat;
-        }
-      }
-      document.getElementById('reportTopCategory').textContent = topCat;
-    }
+    localStorage.setItem(
+      "moneyBrainData",
+      JSON.stringify(state)
+    );
 
     updateUI();
-  </script>
+
+  }
+
+
+  /* =========================================
+     MONEY FORMAT
+  ========================================= */
+
+  function money(amount) {
+
+    return (
+      state.currency +
+      Number(amount).toLocaleString(
+        undefined,
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
+      )
+    );
+
+  }
+
+
+  /* =========================================
+     NAVIGATION
+  ========================================= */
+
+  function showSection(section) {
+
+    document
+      .querySelectorAll(".section")
+      .forEach(
+        el => el.classList.remove("active")
+      );
+
+    document
+      .getElementById("section-" + section)
+      .classList.add("active");
+
+    document
+      .querySelectorAll(".nav button")
+      .forEach(
+        btn => btn.classList.remove("active")
+      );
+
+    const nav =
+      document.getElementById(
+        "nav-" + section
+      );
+
+    if (nav) {
+      nav.classList.add("active");
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  }
+
+
+  /* =========================================
+     QUICK TRANSACTION
+  ========================================= */
+
+  function openTransaction(type) {
+
+    showSection("transactions");
+
+    document.getElementById(
+      "txType"
+    ).value = type;
+
+    toggleCategory();
+
+    document.getElementById(
+      "txAmount"
+    ).focus();
+
+  }
+
+
+  /* =========================================
+     CATEGORY
+  ========================================= */
+
+  function toggleCategory() {
+
+    const type =
+      document.getElementById(
+        "txType"
+      ).value;
+
+    document.getElementById(
+      "categoryGroup"
+    ).style.display =
+      type === "income"
+        ? "none"
+        : "block";
+
+  }
+
+
+  /* =========================================
+     ADD TRANSACTION
+  ========================================= */
+
+  function addTransaction() {
+
+    const type =
+      document.getElementById(
+        "txType"
+      ).value;
+
+    const amount =
+      parseFloat(
+        document.getElementById(
+          "txAmount"
+        ).value
+      );
+
+    const category =
+      type === "income"
+        ? "Income"
+        : document.getElementById(
+            "txCategory"
+          ).value;
+
+    const description =
+      document.getElementById(
+        "txDesc"
+      ).value.trim();
+
+    if (
+      !amount ||
+      amount <= 0
+    ) {
+
+      alert(
+        "Please enter a valid amount."
+      );
+
+      return;
+
+    }
+
+
+    state.transactions.unshift({
+
+      id: Date.now(),
+
+      type: type,
+
+      category: category,
+
+      amount: amount,
+
+      desc:
+        description ||
+        category,
+
+      date:
+        new Date().toLocaleDateString()
+
+    });
+
+
+    saveData();
+
+
+    document.getElementById(
+      "txAmount"
+    ).value = "";
+
+    document.getElementById(
+      "txDesc"
+    ).value = "";
+
+
+    showSection("dashboard");
+
+  }
+
+
+  /* =========================================
+     DELETE TRANSACTION
+  ========================================= */
+
+  function deleteTransaction(id) {
+
+    state.transactions =
+      state.transactions.filter(
+        t => t.id !== id
+      );
+
+    saveData();
+
+  }
+
+
+  /* =========================================
+     BUDGET
+  ========================================= */
+
+  function saveBudget() {
+
+    const amount =
+      parseFloat(
+        document.getElementById(
+          "budgetLimit"
+        ).value
+      );
+
+    if (
+      isNaN(amount) ||
+      amount < 0
+    ) {
+
+      alert(
+        "Please enter a valid budget."
+      );
+
+      return;
+
+    }
+
+    state.budget = amount;
+
+    saveData();
+
+  }
+
+
+  /* =========================================
+     CREATE GOAL
+  ========================================= */
+
+  function createGoal() {
+
+    const title =
+      document.getElementById(
+        "goalTitle"
+      ).value.trim();
+
+    const target =
+      parseFloat(
+        document.getElementById(
+          "goalTarget"
+        ).value
+      );
+
+
+    if (
+      !title ||
+      !target ||
+      target <= 0
+    ) {
+
+      alert(
+        "Please provide a goal name and target amount."
+      );
+
+      return;
+
+    }
+
+
+    state.goals.push({
+
+      id: Date.now(),
+
+      title: title,
+
+      target: target,
+
+      saved: 0
+
+    });
+
+
+    saveData();
+
+
+    document.getElementById(
+      "goalTitle"
+    ).value = "";
+
+    document.getElementById(
+      "goalTarget"
+    ).value = "";
+
+  }
+
+
+  /* =========================================
+     DEPOSIT TO GOAL
+  ========================================= */
+
+  function depositToGoal(id) {
+
+    const amount =
+      parseFloat(
+        prompt(
+          "How much do you want to save toward this goal?"
+        )
+      );
+
+
+    if (
+      !amount ||
+      amount <= 0
+    ) {
+
+      return;
+
+    }
+
+
+    const goal =
+      state.goals.find(
+        g => g.id === id
+      );
+
+
+    if (!goal) {
+      return;
+    }
+
+
+    goal.saved += amount;
+
+
+    state.transactions.unshift({
+
+      id: Date.now(),
+
+      type: "expense",
+
+      category: "Savings",
+
+      amount: amount,
+
+      desc:
+        "Deposit to " +
+        goal.title,
+
+      date:
+        new Date().toLocaleDateString()
+
+    });
+
+
+    saveData();
+
+  }
+
+
+  /* =========================================
+     CURRENCY
+  ========================================= */
+
+  function changeCurrency() {
+
+    state.currency =
+      document.getElementById(
+        "currencySelect"
+      ).value;
+
+    saveData();
+
+  }
+
+
+  /* =========================================
+     CLEAR HISTORY
+  ========================================= */
+
+  function clearHistory() {
+
+    if (
+      !confirm(
+        "Clear all transaction history?"
+      )
+    ) {
+
+      return;
+
+    }
+
+
+    state.transactions = [];
+
+    saveData();
+
+  }
+
+
+  /* =========================================
+     RESET EVERYTHING
+  ========================================= */
+
+  function resetAllData() {
+
+    if (
+      !confirm(
+        "Reset ALL Money Brain data?"
+      )
+    ) {
+
+      return;
+
+    }
+
+
+    state = {
+
+      transactions: [],
+
+      budget: 0,
+
+      goals: [],
+
+      currency: "$"
+
+    };
+
+
+    saveData();
+
+  }
+
+
+  /* =========================================
+     TRANSACTION HTML
+  ========================================= */
+
+  function transactionHTML(t) {
+
+    const sign =
+      t.type === "income"
+        ? "+"
+        : "-";
+
+    const color =
+      t.type === "income"
+        ? "income"
+        : "expense";
+
+
+    return `
+
+      <div class="transaction">
+
+        <div>
+
+          <div class="transaction-title">
+            ${escapeHTML(t.desc)}
+          </div>
+
+          <div class="transaction-meta">
+            ${escapeHTML(t.category)}
+            •
+            ${escapeHTML(t.date)}
+          </div>
+
+        </div>
+
+        <div>
+
+          <span
+            class="transaction-amount ${color}">
+            ${sign}${money(t.amount)}
+          </span>
+
+          <button
+            class="delete-btn"
+            onclick="deleteTransaction(${t.id})">
+            ✕
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  /* =========================================
+     ESCAPE TEXT
+  ========================================= */
+
+  function escapeHTML(text) {
+
+    return String(text)
+
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+
+      .replace(
+        /</g,
+        "&lt;"
+      )
+
+      .replace(
+        />/g,
+        "&gt;"
+      )
+
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
+  }
+
+
+  /* =========================================
+     UPDATE UI
+  ========================================= */
+
+  function updateUI() {
+
+    let income = 0;
+
+    let expenses = 0;
+
+    const categories = {};
+
+
+    state.transactions.forEach(
+      transaction => {
+
+        if (
+          transaction.type === "income"
+        ) {
+
+          income +=
+            Number(
+              transaction.amount
+            );
+
+        } else {
+
+          expenses +=
+            Number(
+              transaction.amount
+            );
+
+
+          categories[
+            transaction.category
+          ] =
+            (
+              categories[
+                transaction.category
+              ] || 0
+            ) +
+            Number(
+              transaction.amount
+            );
+
+        }
+
+      }
+    );
+
+
+    const balance =
+      income - expenses;
+
+
+    /* BALANCE */
+
+    document.getElementById(
+      "totalBalance"
+    ).textContent =
+      money(balance);
+
+
+    document.getElementById(
+      "totalIncome"
+    ).textContent =
+      "+" + money(income);
+
+
+    document.getElementById(
+      "totalExpense"
+    ).textContent =
+      "-" + money(expenses);
+
+
+    /* SNAPSHOT */
+
+    document.getElementById(
+      "snapshotSavings"
+    ).textContent =
+      money(balance);
+
+
+    document.getElementById(
+      "snapshotTransactions"
+    ).textContent =
+      state.transactions.length;
+
+
+    /* TRANSACTIONS */
+
+    const dashboard =
+      document.getElementById(
+        "dashboardTransactions"
+      );
+
+    const all =
+      document.getElementById(
+        "allTransactions"
+      );
+
+
+    if (
+      state.transactions.length === 0
+    ) {
+
+      dashboard.innerHTML =
+        '<div class="empty">No transactions recorded yet.</div>';
+
+      all.innerHTML =
+        '<div class="empty">No transactions recorded yet.</div>';
+
+    } else {
+
+      dashboard.innerHTML =
+        state.transactions
+          .slice(0, 5)
+          .map(transactionHTML)
+          .join("");
+
+
+      all.innerHTML =
+        state.transactions
+          .map(transactionHTML)
+          .join("");
+
+    }
+
+
+    /* BUDGET */
+
+    const budgetText =
+      document.getElementById(
+        "budgetText"
+      );
+
+    const budgetProgress =
+      document.getElementById(
+        "budgetProgress"
+      );
+
+
+    if (
+      state.budget > 0
+    ) {
+
+      const percentage =
+        Math.min(
+          100,
+          (
+            expenses /
+            state.budget
+          ) *
+          100
+        );
+
+
+      budgetText.textContent =
+        money(expenses) +
+        " spent of " +
+        money(state.budget) +
+        " (" +
+        percentage.toFixed(1) +
+        "%)";
+
+
+      budgetProgress.style.width =
+        percentage + "%";
+
+    } else {
+
+      budgetText.textContent =
+        "No budget set.";
+
+      budgetProgress.style.width =
+        "0%";
+
+    }
+
+
+    /* GOALS */
+
+    const goals =
+      document.getElementById(
+        "goalsList"
+      );
+
+
+    if (
+      state.goals.length === 0
+    ) {
+
+      goals.innerHTML =
+        '<div class="empty">No savings goals yet.</div>';
+
+    } else {
+
+      goals.innerHTML =
+        state.goals
+          .map(goal => {
+
+            const percentage =
+              Math.min(
+                100,
+                (
+                  goal.saved /
+                  goal.target
+                ) *
+                100
+              );
+
+
+            return `
+
+              <div class="goal">
+
+                <div class="goal-top">
+
+                  <div class="goal-name">
+                    ${escapeHTML(goal.title)}
+                  </div>
+
+                  <div class="goal-number">
+                    ${money(goal.saved)}
+                    /
+                    ${money(goal.target)}
+                  </div>
+
+                </div>
+
+                <div class="progress">
+
+                  <div
+                    class="progress-fill"
+                    style="width:${percentage}%">
+                  </div>
+
+                </div>
+
+                <div class="goal-number">
+                  ${percentage.toFixed(1)}% complete
+                </div>
+
+                <br>
+
+                <button
+                  class="goal-btn"
+                  onclick="depositToGoal(${goal.id})">
+                  ＋ Add Money
+                </button>
+
+              </div>
+
+            `;
+
+          })
+          .join("");
+
+    }
+
+
+    /* REPORT */
+
+    document.getElementById(
+      "reportIncome"
+    ).textContent =
+      money(income);
+
+
+    document.getElementById(
+      "reportExpense"
+    ).textContent =
+      money(expenses);
+
+
+    document.getElementById(
+      "reportSavings"
+    ).textContent =
+      money(balance);
+
+
+    let topCategory = "N/A";
+
+    let highest = 0;
+
+
+    Object.keys(categories)
+      .forEach(category => {
+
+        if (
+          categories[category] >
+          highest
+        ) {
+
+          highest =
+            categories[category];
+
+          topCategory =
+            category;
+
+        }
+
+      });
+
+
+    document.getElementById(
+      "reportTopCategory"
+    ).textContent =
+      topCategory;
+
+
+    /* INSIGHTS */
+
+    generateInsights();
+
+
+    /* CURRENCY SELECT */
+
+    const currencySelect =
+      document.getElementById(
+        "currencySelect"
+      );
+
+    if (currencySelect) {
+
+      currencySelect.value =
+        state.currency || "$";
+
+    }
+
+  }
+
+
+  /* =========================================
+     INSIGHTS
+  ========================================= */
+
+  function generateInsights() {
+
+    const box =
+      document.getElementById(
+        "insightsContent"
+      );
+
+
+    if (
+      state.transactions.length === 0
+    ) {
+
+      box.innerHTML = `
+
+        <div class="empty">
+          Add some transactions and
+          Money Brain will analyze them.
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    let income = 0;
+
+    let expenses = 0;
+
+    const categories = {};
+
+
+    state.transactions.forEach(
+      t => {
+
+        if (
+          t.type === "income"
+        ) {
+
+          income +=
+            Number(t.amount);
+
+        } else {
+
+          expenses +=
+            Number(t.amount);
+
+          categories[t.category] =
+            (
+              categories[t.category] || 0
+            ) +
+            Number(t.amount);
+
+        }
+
+      }
+    );
+
+
+    let topCategory = "N/A";
+
+    let highest = 0;
+
+
+    Object.keys(categories)
+      .forEach(category => {
+
+        if (
+          categories[category] >
+          highest
+        ) {
+
+          highest =
+            categories[category];
+
+          topCategory =
+            category;
+
+        }
+
+      });
+
+
+    const savings =
+      income - expenses;
+
+
+    let message = "";
+
+
+    if (
+      income === 0
+    ) {
+
+      message +=
+        "💡 You haven't recorded any income yet.<br><br>";
+
+    }
+
+
+    if (
+      expenses > income &&
+      income > 0
+    ) {
+
+      message +=
+        "⚠️ Your expenses are currently higher than your recorded income.<br><br>";
+
+    }
+
+
+    if (
+      savings > 0
+    ) {
+
+      message +=
+        "✅ Your recorded income is higher than your expenses. You currently have a positive balance.<br><br>";
+
+    }
+
+
+    if (
+      topCategory !== "N/A"
+    ) {
+
+      message +=
+        "🔎 Your biggest expense category is <strong>" +
+        escapeHTML(topCategory) +
+        "</strong> at " +
+        money(highest) +
+        ".<br><br>";
+
+    }
+
+
+    if (
+      state.budget > 0 &&
+      expenses > state.budget
+    ) {
+
+      message +=
+        "🚨 You have exceeded your current budget.<br><br>";
+
+    }
+
+
+    if (
+      state.budget > 0 &&
+      expenses <= state.budget
+    ) {
+
+      message +=
+        "👍 Your recorded spending is still within your budget.<br><br>";
+
+    }
+
+
+    box.innerHTML = message;
+
+  }
+
+
+  /* =========================================
+     START
+  ========================================= */
+
+  updateUI();
+
+  toggleCategory();
+
+</script>
+
 </body>
 </html>
