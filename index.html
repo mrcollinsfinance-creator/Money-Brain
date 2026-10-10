@@ -1105,6 +1105,57 @@
       ? String(telegramUser.id)
       : null;
 
+  
+  /* =========================================
+     MONEY BRAIN USER TRACKING
+  ========================================= */
+
+  async function trackTelegramUser() {
+    if (!tg || !tg.initData) {
+      console.log(
+        "Open Money Brain inside Telegram to enable tracking."
+      );
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://llqhwpdzikgfqprnpozx.supabase.co/functions/v1/track-money-brain-user",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            telegram_init_data: tg.initData,
+            source: "telegram_mini_app"
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.ok) {
+        console.error(
+          "Money Brain tracking failed:",
+          result.error || response.status
+        );
+        return;
+      }
+
+      console.log(
+        "Money Brain user tracking succeeded."
+      );
+    } catch (error) {
+      console.error(
+        "Money Brain tracking request failed:",
+        error
+      );
+    }
+  }
+
+  trackTelegramUser();
+  
 
   /* =========================================
      CLOUD STORAGE
