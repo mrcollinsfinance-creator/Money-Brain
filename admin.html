@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Money Brain Admin</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      background: #101827;
+      color: #f8fafc;
+      font-family: Arial, sans-serif;
+    }
+    main { max-width: 760px; margin: auto; }
+    h1 { margin-bottom: 8px; }
+    .muted { color: #aab6c8; line-height: 1.5; }
+    .panel, .stat {
+      background: #1c293b;
+      border: 1px solid #344256;
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+    label { display: block; margin-bottom: 8px; }
+    input, button {
+      width: 100%;
+      padding: 13px;
+      border-radius: 9px;
+      font-size: 16px;
+    }
+    input {
+      background: #101827;
+      color: white;
+      border: 1px solid #526176;
+      margin-bottom: 12px;
+    }
+    button {
+      border: 0;
+      background: #22c55e;
+      color: #082014;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .number {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 12px;
+    }
+    #message { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>🧠 Money Brain</h1>
+  <p class="muted">Admin Dashboard · User Growth</p>
+
+  <section class="panel">
+    <h2>Administrator Access</h2>
+    <p class="muted">
+      Enter your private dashboard key to load statistics.
+      Do not enter your Telegram bot token here.
+    </p>
+
+    <label for="adminKey">Dashboard key</label>
+    <input id="adminKey" type="password"
+      autocomplete="off" placeholder="Enter dashboard key">
+
+    <button id="loadButton" type="button">
+      Load Statistics
+    </button>
+    <p id="message" class="muted" role="status">
+      Statistics have not been loaded.
+    </p>
+  </section>
+
+  <section class="stats" aria-live="polite">
+    <div class="stat">
+      <div class="muted">Total Users</div>
+      <div class="number" id="total">—</div>
+    </div>
+    <div class="stat">
+      <div class="muted">New Today</div>
+      <div class="number" id="today">—</div>
+    </div>
+    <div class="stat">
+      <div class="muted">New This Week</div>
+      <div class="number" id="week">—</div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const FUNCTION_URL =
+    "https://llqhwpdzikgfqprnpozx.supabase.co/functions/v1/money-brain-admin-stats";
+
+  // Public project key only; never put a service-role key here.
+  const SUPABASE_ANON_KEY = "ADD_YOUR_SUPABASE_ANON_KEY_HERE";
+
+  const button = document.getElementById("loadButton");
+  const message = document.getElementById("message");
+
+  button.addEventListener("click", async () => {
+    const adminKey = document.getElementById("adminKey").value.trim();
+
+    if (!adminKey) {
+      message.textContent = "Enter your dashboard key first.";
+      return;
+    }
+
+    if (SUPABASE_ANON_KEY === "ADD_YOUR_SUPABASE_ANON_KEY_HERE") {
+      message.textContent =
+        "Setup is incomplete. The dashboard must be configured before use.";
+      return;
+    }
+
+    button.disabled = true;
+    message.textContent = "Loading statistics…";
+
+    try {
+      const response = await fetch(FUNCTION_URL, {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "x-admin-key": adminKey
+        }
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || result.ok !== true) {
+        throw new Error(
+          result.error || "Could not load statistics."
+        );
+      }
+
+      document.getElementById("total").textContent =
+        result.total_users;
+      document.getElementById("today").textContent =
+        result.new_users_today;
+      document.getElementById("week").textContent =
+        result.new_users_this_week;
+
+      message.textContent = "Statistics loaded successfully.";
+    } catch (error) {
+      message.textContent =
+        error.message || "Something went wrong. Try again.";
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
