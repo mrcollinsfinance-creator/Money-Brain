@@ -4681,7 +4681,44 @@ const SUPABASE_PUBLISHABLE_KEY =
      START
   ========================================= */
 
-  initializeData();
+  
+initializeData().then(async () => {
+  if (!tg?.initData || !state) return;
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/functions/v1/money-brain-sync`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({
+          platform: "telegram",
+          telegram_init_data: tg.initData,
+          mode: "backup_if_missing",
+          state: state,
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      console.error("Money Brain backup failed:", result.error);
+      return;
+    }
+
+    console.log(
+      result.existed
+        ? "Existing cloud account preserved."
+        : "Money Brain backup created."
+    );
+  } catch (error) {
+    console.error("Money Brain backup request failed:", error);
+  }
+});
 
 </script>
 
