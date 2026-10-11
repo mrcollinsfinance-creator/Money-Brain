@@ -1915,6 +1915,51 @@ const SUPABASE_PUBLISHABLE_KEY =
 
   }
 
+  /* =========================================
+     SAVE STATE TO SUPABASE
+  ========================================= */
+
+  async function saveSupabaseState() {
+    if (!tg?.initData || !state) {
+      return false;
+    }
+
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/functions/v1/money-brain-sync`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            platform: "telegram",
+            telegram_init_data: tg.initData,
+            state: sanitizeState(state),
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.ok) {
+        console.error(
+          "Money Brain Supabase save failed:",
+          result.error || response.status
+        );
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error(
+        "Money Brain Supabase save failed:",
+        error
+      );
+      return false;
+    }
+    }
 
   /* =========================================
      INITIALIZE DATA
