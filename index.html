@@ -2095,7 +2095,9 @@ const SUPABASE_PUBLISHABLE_KEY =
       saveCloudState();
 
     }
-
+    if (tg?.initData) {
+      saveSupabaseState();
+  }
 
     updateUI();
 
