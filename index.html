@@ -4810,9 +4810,10 @@ const supabaseClient = window.supabase.createClient(
 
       if (error) throw error;
 
-      showAuthMessage(
-        "Signed in successfully. Website data sync is the next step."
-      );
+      showAuthMessage("Signed in successfully.");
+
+document.getElementById("authPanel").style.display = "none";
+document.querySelector(".app").style.display = "block";
     } catch (error) {
       showAuthMessage(error.message || "Could not sign in.");
     }
