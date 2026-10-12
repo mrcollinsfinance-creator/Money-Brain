@@ -581,6 +581,22 @@
 
 <body>
 
+<div id="authPanel" style="display:none; padding:20px; max-width:420px; margin:auto;">
+  <h2>🧠 Money Brain</h2>
+  <p>Sign in or create an account to access Money Brain on the web.</p>
+
+  <label for="authEmail">Email address</label>
+  <input id="authEmail" type="email" placeholder="Enter your email" autocomplete="email" style="display:block; width:100%; padding:12px; margin:8px 0 16px;">
+
+  <label for="authPassword">Password</label>
+  <input id="authPassword" type="password" placeholder="At least 6 characters" autocomplete="current-password" style="display:block; width:100%; padding:12px; margin:8px 0 16px;">
+
+  <button type="button" onclick="registerWebUser()" style="width:100%; padding:12px; margin-bottom:10px;">Create Account</button>
+  <button type="button" onclick="loginWebUser()" style="width:100%; padding:12px;">Sign In</button>
+
+  <p id="authMessage" role="status"></p>
+</div>
+  
 <div class="app">
 
   <div class="header">
