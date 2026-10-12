@@ -4746,7 +4746,84 @@ const supabaseClient = window.supabase.createClient(
 
   }
 
+  // =========================================
+  // WEBSITE SIGN UP AND LOGIN
+  // =========================================
 
+  function showAuthMessage(message) {
+    const messageBox = document.getElementById("authMessage");
+    if (messageBox) {
+      messageBox.textContent = message;
+    }
+  }
+
+  async function registerWebUser() {
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!email || !password) {
+      showAuthMessage("Please enter your email and password.");
+      return;
+    }
+
+    if (password.length < 6) {
+      showAuthMessage("Your password must be at least 6 characters.");
+      return;
+    }
+
+    try {
+      showAuthMessage("Creating your account...");
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      showAuthMessage(
+        data.session
+          ? "Account created successfully. Website data sync is the next step."
+          : "Account created. Check your email to confirm your account."
+      );
+    } catch (error) {
+      showAuthMessage(error.message || "Could not create your account.");
+    }
+  }
+
+  async function loginWebUser() {
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!email || !password) {
+      showAuthMessage("Please enter your email and password.");
+      return;
+    }
+
+    try {
+      showAuthMessage("Signing in...");
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      showAuthMessage(
+        "Signed in successfully. Website data sync is the next step."
+      );
+    } catch (error) {
+      showAuthMessage(error.message || "Could not sign in.");
+    }
+  }
+
+  // Show the login panel on the website, not inside Telegram.
+  if (!tg?.initData) {
+    document.getElementById("authPanel").style.display = "block";
+    document.querySelector(".app").style.display = "none";
+  }
+  
   /* =========================================
      START
   ========================================= */
