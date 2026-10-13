@@ -4846,33 +4846,45 @@ async function initializeData() {
     }
   }
 
-  async function loginWebUser() {
-    const email = document.getElementById("authEmail").value.trim();
-    const password = document.getElementById("authPassword").value;
+async function loginWebUser() {
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
 
-    if (!email || !password) {
-      showAuthMessage("Please enter your email and password.");
+  if (!email || !password) {
+    showAuthMessage("Please enter your email and password.");
+    return;
+  }
+
+  try {
+    showAuthMessage("Signing in...");
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    showAuthMessage("Loading your saved financial data...");
+
+    dataReady = false;
+    await initializeData();
+
+    if (!dataReady) {
+      showAuthMessage(
+        "Sign-in succeeded, but your data could not be loaded. Please try again."
+      );
       return;
     }
 
-    try {
-      showAuthMessage("Signing in...");
+    document.getElementById("authPanel").style.display = "none";
+    document.querySelector(".app").style.display = "block";
 
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      showAuthMessage("Signed in successfully.");
-
-document.getElementById("authPanel").style.display = "none";
-document.querySelector(".app").style.display = "block";
-    } catch (error) {
-      showAuthMessage(error.message || "Could not sign in.");
-    }
+    showAuthMessage("Signed in successfully.");
+  } catch (error) {
+    showAuthMessage(error.message || "Could not sign in.");
   }
+}
 
   // Show the login panel on the website, not inside Telegram.
   if (!tg?.initData) {
