@@ -2024,6 +2024,60 @@ async function loadSupabaseState() {
 
   return result.state || null;
 }
+  async function saveWebSupabaseState() {
+  if (tg?.initData || !state) {
+    return false;
+  }
+
+  try {
+    const {
+      data: { session },
+      error: sessionError
+    } = await supabaseClient.auth.getSession();
+
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    if (!session) {
+      return false;
+    }
+
+    const response = await fetch(
+      `${SUPABASE_URL}/functions/v1/money-brain-sync`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          platform: "web",
+          state: sanitizeState(state)
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      console.error(
+        "Money Brain website save failed:",
+        result.error || response.status
+      );
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Money Brain website save failed:",
+      error
+    );
+    return false;
+  }
+}
   
   /* =========================================
      INITIALIZE DATA
