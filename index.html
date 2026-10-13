@@ -2082,106 +2082,66 @@ async function loadSupabaseState() {
   /* =========================================
      INITIALIZE DATA
   ========================================= */
+  
+async function initializeData() {
+  const localState = readLocalState();
 
-  async function initializeData() {
+  // Preserve Telegram Cloud Storage.
+  if (cloudStorage && telegramUserId) {
+    cloudReady = true;
 
-    const localState =
-      readLocalState();
+    const cloudState = await loadCloudState();
 
+    if (cloudState) {
+      state = sanitizeState(cloudState);
+      saveLocalState();
+    } else if (localState) {
+      const localOwner = localStorage.getItem(LOCAL_OWNER_KEY);
 
-    if (
-      cloudStorage &&
-      telegramUserId
-    ) {
-
-      cloudReady = true;
-
-
-      const cloudState =
-        await loadCloudState();
-
-
-      if (cloudState) {
-
-        state =
-          sanitizeState(
-            cloudState
-          );
-
-        saveLocalState();
-
-      }
-
-      else if (localState) {
-
-        const localOwner =
-          localStorage.getItem(
-            LOCAL_OWNER_KEY
-          );
-
-
-        if (
-          !localOwner ||
-          localOwner === telegramUserId
-        ) {
-
-          state =
-            sanitizeState(
-              localState
-            );
-
-          await saveCloudState();
-
-          saveLocalState();
-
-        }
-
-        else {
-
-          state =
-            createDefaultState();
-
-          saveLocalState();
-
-        }
-
-      }
-
-      else {
-
-        state =
-          createDefaultState();
-
+      if (!localOwner || localOwner === telegramUserId) {
+        state = sanitizeState(localState);
         await saveCloudState();
-
         saveLocalState();
-
+      } else {
+        state = createDefaultState();
+        saveLocalState();
       }
-
+    } else {
+      state = createDefaultState();
+      await saveCloudState();
+      saveLocalState();
     }
+  }
 
-    else {
+  // Load the signed-in website user's data.
+  else if (!tg?.initData) {
+    cloudReady = false;
 
-      cloudReady = false;
+    try {
+      const webState = await loadSupabaseState();
 
-      state =
-        localState ||
-        createDefaultState();
-
+      state = webState
+        ? sanitizeState(webState)
+        : createDefaultState();
+    } catch (error) {
+      console.error("Money Brain website load failed:", error);
+      dataReady = false;
+      return;
     }
+  }
 
+  // Preserve the existing fallback.
+  else {
+    cloudReady = false;
+    state = localState || createDefaultState();
+  }
 
-    state =
-      sanitizeState(state);
+  state = sanitizeState(state);
+  dataReady = true;
 
-
-    dataReady = true;
-
-
-    updateUI();
-
-    toggleCategory();
-
+  updateUI();
+  toggleCategory();
+}
   }
 
 
