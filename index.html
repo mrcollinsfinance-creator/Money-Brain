@@ -2172,8 +2172,10 @@ async function initializeData() {
 
     }
      if (tg?.initData) {
-      saveSupabaseState();
-     }
+  saveSupabaseState();
+} else {
+  saveWebSupabaseState();
+}
 
     updateUI();
 
