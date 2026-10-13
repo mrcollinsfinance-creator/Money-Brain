@@ -4877,10 +4877,8 @@ async function loginWebUser() {
     dataReady = false;
     await initializeData();
 
+
     if (!dataReady) {
-      showAuthMessage(
-        "Sign-in succeeded, but your data could not be loaded. Please try again."
-      );
       return;
     }
 
