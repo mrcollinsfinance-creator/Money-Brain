@@ -2125,7 +2125,14 @@ async function initializeData() {
         : createDefaultState();
     } catch (error) {
       console.error("Money Brain website load failed:", error);
+
       dataReady = false;
+
+      showAuthMessage(
+        "Data loading failed: " +
+        (error.message || String(error))
+      );
+
       return;
     }
   }
